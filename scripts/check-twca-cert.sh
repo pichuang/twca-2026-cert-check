@@ -17,7 +17,7 @@ usage() {
         '批次：bash scripts/check-twca-cert.sh [選項] --file FILE（或 -f FILE）' \
         '選項：--file/-f FILE、--ca-file FILE、--timeout SECONDS、--data-file FILE、--verbose、--help' \
         '預設只顯示換證結論；--verbose 顯示完整憑證與診斷。' \
-        '範例：bash scripts/check-twca-cert.sh https://www.mnd.gov.tw/' \
+        '範例：bash scripts/check-twca-cert.sh https://www.twca.com.tw/' \
         '相依工具：Bash 3.2 以上、OpenSSL 3 以上；可設定 OPENSSL_BIN。'
 }
 

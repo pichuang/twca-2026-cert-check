@@ -10,7 +10,7 @@ check_target() {
     [[ $host:$port == "$2" ]] || fail "解析結果錯誤：$1"
 }
 
-check_target https://www.mnd.gov.tw/ www.mnd.gov.tw:443
+check_target https://www.twca.com.tw/ www.twca.com.tw:443
 check_target 'https://example.com:8443/path?query#fragment' example.com:8443
 check_target example.com:00443 example.com:443
 check_target xn--fiqs8s.example xn--fiqs8s.example:443

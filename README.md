@@ -32,10 +32,10 @@ sudo apt-get install openssl ca-certificates
 **檢查一個網站**：把範例網址改成你要檢查的網站。
 
 ```bash
-bash scripts/check-twca-cert.sh https://www.mnd.gov.tw/
+bash scripts/check-twca-cert.sh https://www.twca.com.tw/
 ```
 
-也可以只填網域，例如 `www.mnd.gov.tw`。請勿使用 `http://` 或直接填 IP 位址。
+也可以只填網域，例如 `www.twca.com.tw`。請勿使用 `http://` 或直接填 IP 位址。
 
 **檢查多個網站**：在 [url.list](url.list) 中每行填一個網址或網域，也可參考 [url.list.example](url.list.example)。
 
