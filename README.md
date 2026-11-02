@@ -10,21 +10,6 @@
 
 需要 Bash 3.2 以上、OpenSSL 3 以上，以及網路連線。
 
-**macOS**：先安裝 [Homebrew](https://brew.sh/)，再於終端機執行：
-
-```bash
-brew install openssl@3
-export OPENSSL_BIN="$(brew --prefix openssl@3)/bin/openssl"
-```
-
-macOS 內建的 LibreSSL 無法使用。每次開啟新的終端機，都要重新執行上面的 `export`。
-
-**Ubuntu／Debian**：使用提供 OpenSSL 3 以上的版本，執行：
-
-```bash
-sudo apt-get install openssl ca-certificates
-```
-
 ## 2. 執行檢查
 
 在終端機切換到這個專案資料夾，再執行以下指令。
@@ -32,7 +17,7 @@ sudo apt-get install openssl ca-certificates
 **檢查一個網站**：把範例網址改成你要檢查的網站。
 
 ```bash
-bash scripts/check-twca-cert.sh https://www.twca.com.tw/
+bash check-twca-cert.sh https://www.twca.com.tw/
 ```
 
 也可以只填網域，例如 `www.twca.com.tw`。請勿使用 `http://` 或直接填 IP 位址。
@@ -47,7 +32,7 @@ www.gov.tw
 接著執行：
 
 ```bash
-bash scripts/check-twca-cert.sh -f url.list
+bash check-twca-cert.sh -f url.list
 ```
 
 `-f` 與 `--file` 相同。空白行與 `#` 開頭的註解會略過；某個網站檢查失敗時，仍會繼續檢查其餘網站。
@@ -70,13 +55,13 @@ bash scripts/check-twca-cert.sh -f url.list
 加上 `--verbose`，取得詳細結果供網站管理者查閱：
 
 ```bash
-bash scripts/check-twca-cert.sh --verbose -f url.list
+bash check-twca-cert.sh --verbose -f url.list
 ```
 
 預設每個網站最多等待 15 秒；可用 `--timeout 30` 改為 30 秒。其他選項請查看：
 
 ```bash
-bash scripts/check-twca-cert.sh --help
+bash check-twca-cert.sh --help
 ```
 
 自動化使用時，退出碼 `0` 表示此次未發現換證需求且連線驗證通過，`1` 表示建議換證或需確認，`2` 表示有檢查錯誤或連線驗證失敗。`1` 不代表程式故障；批次檢查回傳所有結果中最高的退出碼。
@@ -94,9 +79,7 @@ bash scripts/check-twca-cert.sh --help
 ## 開發者測試
 
 ```bash
-/bin/bash -n scripts/check-twca-cert.sh tests/test-check-twca-cert.sh
-shellcheck --shell=bash scripts/check-twca-cert.sh tests/test-check-twca-cert.sh
+/bin/bash -n check-twca-cert.sh tests/test-check-twca-cert.sh
+shellcheck --shell=bash check-twca-cert.sh tests/test-check-twca-cert.sh
 /bin/bash tests/test-check-twca-cert.sh
 ```
-
-一般使用者不需要安裝 ShellCheck；測試不需連線到公開網站。

@@ -2,7 +2,7 @@
 set -eu
 export LC_ALL=C
 root_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-source "$root_dir/scripts/check-twca-cert.sh"
+source "$root_dir/check-twca-cert.sh"
 
 check_target() {
     target=$1
@@ -195,7 +195,7 @@ done
 printf '%s\n' 'keep' > "$test_dir/cert-existing.pem"
 mkdir "$test_dir/tmp"
 cli_exit=0
-(cd "$test_dir"; TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" "https://localhost:$server_port/") > "$test_dir/report" 2>&1 || cli_exit=$?
+(cd "$test_dir"; TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/check-twca-cert.sh" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" "https://localhost:$server_port/") > "$test_dir/report" 2>&1 || cli_exit=$?
 [[ $cli_exit == 1 ]] || { cat "$test_dir/report"; fail "CLI 退出碼錯誤：$cli_exit"; }
 grep -q '換證結論：❌ 要。請在 2026-11-06 00:00 前完成換證' "$test_dir/report" || fail 'CLI 未顯示換證期限。'
 [[ $(wc -l < "$test_dir/report") -eq 3 ]] || fail '預設報告不夠精簡。'
@@ -203,7 +203,7 @@ if grep -q 'SHA-256\|subject=\|資料版本' "$test_dir/report"; then fail '預�
 [[ $(cat "$test_dir/cert-existing.pem") == keep ]] || fail '使用者憑證檔遭變更。'
 [[ -z $(find "$test_dir/tmp" -mindepth 1 -print) ]] || fail 'CLI 暫存目錄未清理。'
 cli_exit=0
-OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" --verbose --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" "https://localhost:$server_port/" > "$test_dir/report" 2>&1 || cli_exit=$?
+OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/check-twca-cert.sh" --verbose --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" "https://localhost:$server_port/" > "$test_dir/report" 2>&1 || cli_exit=$?
 [[ $cli_exit == 1 ]] || fail '第二次檢查退出碼不一致。'
 grep -q 'REPLACE_RECOMMENDED' "$test_dir/report" || fail '詳細報告未保留事件狀態。'
 grep -q 'TLS：通過' "$test_dir/report" || fail '詳細報告未保留 TLS 驗證。'
@@ -213,7 +213,7 @@ printf '%s\n' 'PASS：真實本地 TLS、CLI 退出碼、保存使用者檔案�
 printf '# sites\r\n\r\n  https://localhost:%s/  \r\nlocalhost:%s' "$server_port" "$server_port" > "$test_dir/url.list"
 for file_option in --file -f; do
     cli_exit=0
-    TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" "$file_option" "$test_dir/url.list" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" > "$test_dir/report" 2>&1 || cli_exit=$?
+    TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/check-twca-cert.sh" "$file_option" "$test_dir/url.list" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" > "$test_dir/report" 2>&1 || cli_exit=$?
     [[ $cli_exit == 1 ]] || fail "批次退出碼錯誤：$file_option"
     [[ $(grep -c '^目標：' "$test_dir/report") -eq 2 ]] || fail '批次未讀取全部目標或錯誤處理空白行。'
     [[ $(grep -c '^換證結論：❌ 要。' "$test_dir/report") -eq 2 ]] || fail '批次未沿用 CA 與中繼資料選項。'
@@ -221,7 +221,7 @@ for file_option in --file -f; do
 done
 printf '%s\n' '--help' 'http://localhost/' "localhost:$server_port" > "$test_dir/url.list"
 cli_exit=0
-OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" -f "$test_dir/url.list" --verbose --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" > "$test_dir/report" 2>&1 || cli_exit=$?
+OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/check-twca-cert.sh" -f "$test_dir/url.list" --verbose --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" > "$test_dir/report" 2>&1 || cli_exit=$?
 [[ $cli_exit == 2 ]] || fail '批次未彙總錯誤退出碼。'
 grep -q '^目標：--help$' "$test_dir/report" || fail '批次未報告選項形式的無效目標。'
 grep -q '^目標：http://localhost/$' "$test_dir/report" || fail '批次遇到無效目標後未繼續。'
@@ -232,11 +232,11 @@ if grep -q '^用法：' "$test_dir/report"; then fail '清單內容被誤當成 
 printf '# empty\n \t\r\n' > "$test_dir/empty.list"
 for invalid_list in "$test_dir/empty.list" "$test_dir/missing.list" "$test_dir"; do
     cli_exit=0
-    /bin/bash "$root_dir/scripts/check-twca-cert.sh" -f "$invalid_list" > /dev/null 2>&1 || cli_exit=$?
+    /bin/bash "$root_dir/check-twca-cert.sh" -f "$invalid_list" > /dev/null 2>&1 || cli_exit=$?
     [[ $cli_exit == 2 ]] || fail '未拒絕空白、缺少或目錄清單。'
 done
 cli_exit=0
-/bin/bash "$root_dir/scripts/check-twca-cert.sh" -f "$test_dir/url.list" localhost > /dev/null 2>&1 || cli_exit=$?
+/bin/bash "$root_dir/check-twca-cert.sh" -f "$test_dir/url.list" localhost > /dev/null 2>&1 || cli_exit=$?
 [[ $cli_exit == 2 ]] || fail '未拒絕混用清單與單站參數。'
 printf '%s\n' 'PASS：批次長短選項、CRLF、末行無換行、錯誤後繼續、選項隔離與退出碼。'
 
@@ -244,13 +244,13 @@ kill "$server_pid"
 wait "$server_pid" 2>/dev/null || :
 server_pid=''
 cli_exit=0
-OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" --timeout 1 --data-file "$test_dir/data.tsv" "localhost:$server_port" > "$test_dir/report" 2>&1 || cli_exit=$?
+OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/check-twca-cert.sh" --timeout 1 --data-file "$test_dir/data.tsv" "localhost:$server_port" > "$test_dir/report" 2>&1 || cli_exit=$?
 [[ $cli_exit == 2 ]] || fail '連線失敗未回傳 2。'
 grep -q '換證結論：無法判定' "$test_dir/report" || fail '連線失敗未標示無法判定。'
 [[ $(wc -l < "$test_dir/report") -eq 2 ]] || fail '連線錯誤輸出不夠精簡。'
 for invalid_option in --unknown --timeout --ca-file --data-file --file -f; do
     cli_exit=0
-    /bin/bash "$root_dir/scripts/check-twca-cert.sh" "$invalid_option" > /dev/null 2>&1 || cli_exit=$?
+    /bin/bash "$root_dir/check-twca-cert.sh" "$invalid_option" > /dev/null 2>&1 || cli_exit=$?
     [[ $cli_exit == 2 ]] || fail "選項錯誤未回傳 2：$invalid_option"
 done
 data_file=$root_dir/data/twca-intermediates.tsv

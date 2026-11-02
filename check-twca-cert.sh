@@ -13,11 +13,11 @@ fail() {
 
 usage() {
     printf '%s\n' \
-        '用法：bash scripts/check-twca-cert.sh [選項] HTTPS_URL或網域' \
-        '批次：bash scripts/check-twca-cert.sh [選項] --file FILE（或 -f FILE）' \
+        '用法：bash check-twca-cert.sh [選項] HTTPS_URL或網域' \
+        '批次：bash check-twca-cert.sh [選項] --file FILE（或 -f FILE）' \
         '選項：--file/-f FILE、--ca-file FILE、--timeout SECONDS、--data-file FILE、--verbose、--help' \
         '預設只顯示換證結論；--verbose 顯示完整憑證與診斷。' \
-        '範例：bash scripts/check-twca-cert.sh https://www.twca.com.tw/' \
+        '範例：bash check-twca-cert.sh https://www.twca.com.tw/' \
         '相依工具：Bash 3.2 以上、OpenSSL 3 以上；可設定 OPENSSL_BIN。'
 }
 
@@ -304,7 +304,7 @@ main() {
     verbose=0
     timeout_seconds=15
     script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-    data_file=$script_dir/../data/twca-intermediates.tsv
+    data_file=$script_dir/data/twca-intermediates.tsv
     openssl_bin=${OPENSSL_BIN:-openssl}
     while (( $# > 0 )); do
         case "$1" in
