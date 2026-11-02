@@ -82,11 +82,11 @@ write_data "$ca_hash" research_candidate
 set_chain "$test_dir/leaf.pem" "$test_dir/ca.pem"
 verify_tls
 expect_classification REPLACE_RECOMMENDED 1
-expect_decision '要。請在 2026-11-06 00:00 前完成換證'
+expect_decision '❌ 要。請在 2026-11-06 00:00 前完成換證'
 host=wrong.example
 verify_tls
 expect_classification REPLACE_RECOMMENDED 2
-expect_decision '要。請在 2026-11-06 00:00 前完成換證'
+expect_decision '❌ 要。請在 2026-11-06 00:00 前完成換證'
 
 write_data "$ca_hash" article_observation
 set_chain "$test_dir/leaf.pem" "$test_dir/ca.pem"
@@ -139,7 +139,7 @@ grep -q 'unsuitable certificate purpose' "$work_dir/verify.out" || fail '用途�
 set_chain "$test_dir/non-twca.pem"
 verify_tls
 expect_classification NOT_MATCHED 0
-expect_decision '不需要因本次 TWCA 事件在 2026-11-06 前換證'
+expect_decision '✅ 不需要因本次 TWCA 事件在 2026-11-06 前換證'
 host=wrong.example
 verify_tls
 expect_classification INDETERMINATE 2
@@ -197,7 +197,7 @@ mkdir "$test_dir/tmp"
 cli_exit=0
 (cd "$test_dir"; TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" "https://localhost:$server_port/") > "$test_dir/report" 2>&1 || cli_exit=$?
 [[ $cli_exit == 1 ]] || { cat "$test_dir/report"; fail "CLI 退出碼錯誤：$cli_exit"; }
-grep -q '換證結論：要。請在 2026-11-06 00:00 前完成換證' "$test_dir/report" || fail 'CLI 未顯示換證期限。'
+grep -q '換證結論：❌ 要。請在 2026-11-06 00:00 前完成換證' "$test_dir/report" || fail 'CLI 未顯示換證期限。'
 [[ $(wc -l < "$test_dir/report") -eq 3 ]] || fail '預設報告不夠精簡。'
 if grep -q 'SHA-256\|subject=\|資料版本' "$test_dir/report"; then fail '預設報告包含詳細憑證資訊。'; fi
 [[ $(cat "$test_dir/cert-existing.pem") == keep ]] || fail '使用者憑證檔遭變更。'
@@ -216,7 +216,7 @@ for file_option in --file -f; do
     TMPDIR=$test_dir/tmp OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" "$file_option" "$test_dir/url.list" --ca-file "$test_dir/root.pem" --data-file "$test_dir/data.tsv" > "$test_dir/report" 2>&1 || cli_exit=$?
     [[ $cli_exit == 1 ]] || fail "批次退出碼錯誤：$file_option"
     [[ $(grep -c '^目標：' "$test_dir/report") -eq 2 ]] || fail '批次未讀取全部目標或錯誤處理空白行。'
-    [[ $(grep -c '^換證結論：要。' "$test_dir/report") -eq 2 ]] || fail '批次未沿用 CA 與中繼資料選項。'
+    [[ $(grep -c '^換證結論：❌ 要。' "$test_dir/report") -eq 2 ]] || fail '批次未沿用 CA 與中繼資料選項。'
     [[ $(wc -l < "$test_dir/report") -eq 7 ]] || fail '批次預設報告不夠精簡。'
 done
 printf '%s\n' '--help' 'http://localhost/' "localhost:$server_port" > "$test_dir/url.list"
@@ -225,7 +225,7 @@ OPENSSL_BIN=$real_openssl /bin/bash "$root_dir/scripts/check-twca-cert.sh" -f "$
 [[ $cli_exit == 2 ]] || fail '批次未彙總錯誤退出碼。'
 grep -q '^目標：--help$' "$test_dir/report" || fail '批次未報告選項形式的無效目標。'
 grep -q '^目標：http://localhost/$' "$test_dir/report" || fail '批次遇到無效目標後未繼續。'
-grep -q '^換證結論：要。' "$test_dir/report" || fail '批次遇到錯誤後未檢查有效網站。'
+grep -q '^換證結論：❌ 要。' "$test_dir/report" || fail '批次遇到錯誤後未檢查有效網站。'
 grep -q 'SHA-256=' "$test_dir/report" || fail '批次未沿用 --verbose。'
 if grep -q '^用法：' "$test_dir/report"; then fail '清單內容被誤當成 CLI 選項。'; fi
 [[ -z $(find "$test_dir/tmp" -mindepth 1 -print) ]] || fail '批次暫存目錄未清理。'

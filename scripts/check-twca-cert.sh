@@ -221,14 +221,14 @@ classify_twca_risk() {
 format_decision() {
     case "$event_status" in
         REPLACE_RECOMMENDED)
-            printf '%s\n' '換證結論：要。請在 2026-11-06 00:00 前完成換證（保守維運期限，+08:00）。'
+            printf '%s\n' '換證結論：❌ 要。請在 2026-11-06 00:00 前完成換證（保守維運期限，+08:00）。'
             if (( official )); then
                 printf '%s\n' '原因：命中所提供的官方確認中繼資料。請更換終端憑證及完整中繼鏈。'
             else
                 printf '%s\n' '原因：命中 TWCA 問題中繼候選清單，建議換證。'
             fi ;;
         NOT_MATCHED)
-            printf '%s\n' '換證結論：不需要因本次 TWCA 事件在 2026-11-06 前換證。' \
+            printf '%s\n' '換證結論：✅ 不需要因本次 TWCA 事件在 2026-11-06 前換證。' \
                 '原因：此次端點未見 TWCA 憑證鏈，且 TLS 驗證通過。' ;;
         REVIEW_REQUIRED)
             printf '%s\n' '換證結論：無法確定。請在 2026-11-06 前向 TWCA 確認；未確認前按需換證處理。' \
