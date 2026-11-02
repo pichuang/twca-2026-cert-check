@@ -10,6 +10,8 @@
 
 需要 Bash 3.2 以上、OpenSSL 3 以上，以及網路連線。
 
+Windows 可使用 [check-twca-cert.ps1](check-twca-cert.ps1)，需要 **PowerShell 7.4 以上**與 Windows 內建的 `certutil.exe`，不需要 OpenSSL。不支援 Windows PowerShell 5.1；請使用 `pwsh`，不是 `powershell`。
+
 ## 2. 執行檢查
 
 在終端機切換到這個專案資料夾，再執行以下指令。
@@ -36,6 +38,22 @@ bash check-twca-cert.sh -f url.list
 ```
 
 `-f` 與 `--file` 相同。空白行與 `#` 開頭的註解會略過；某個網站檢查失敗時，仍會繼續檢查其餘網站。
+
+### Windows PowerShell 版本
+
+```powershell
+pwsh -NoProfile -File ./check-twca-cert.ps1 https://www.twca.com.tw/
+pwsh -NoProfile -File ./check-twca-cert.ps1 -f ./url.list
+pwsh -NoProfile -File ./check-twca-cert.ps1 --verbose -f ./url.list
+pwsh -NoProfile -File ./check-twca-cert.ps1 --timeout 30 --file ./url.list
+pwsh -NoProfile -File ./check-twca-cert.ps1 --help
+```
+
+沿用 Bash 版本的選項、資料檔、換證判定、期限與退出碼。`--data-file FILE` 可指定相同格式的 TSV；`--ca-file FILE` 可指定包含自簽信任根的 PEM 檔案，此時不使用 Windows 預設信任根。自訂 CA 不會匯入系統信任庫；不接受只提供中繼憑證。
+
+`certutil` 本身無法直接取得 HTTPS／SNI 憑證，因此 PowerShell 版本使用 .NET `SslStream` 進行握手與主機名、用途、有效期間、信任路徑驗證；以 `certutil -hashfile ... SHA256` 比對 DER 憑證指紋，詳細模式另以 `certutil -dump` 顯示憑證資訊。不呼叫 `certutil -verify`，以保留原版不執行 OCSP／CRL 的規則，也不使用 `-urlfetch` 或修改信任庫。
+
+**平台差異**：Windows TLS API 回傳的是建構的驗證路徑，不是 OpenSSL `-showcerts` 的伺服器送出集合；Windows 可能使用本機快取中繼，未選用的替代鏈也可能無法取得。因此不能保證兩版在所有端點的結果完全相同，或用 Windows 版本確認伺服器是否送出完整中繼鏈。兩版都停用自動 AIA 下載。
 
 ## 3. 看懂結果
 
@@ -73,6 +91,7 @@ bash check-twca-cert.sh --help
 - 期限採 **2026-11-06 00:00（+08:00）** 作為保守維運期限；官方公告未載時區，不代表已確認的撤銷時點。
 - 管理者換證時需更新網站憑證及完整中繼鏈，再重新檢查並向 TWCA 核對，不能只補一張中繼憑證。
 - 已在 macOS 搭配 OpenSSL 3 與 4 測試；Linux 尚未完成實測。
+- PowerShell 版本已在 macOS 驗證真實 .NET 本地 TLS 與分類／批次流程，僅 Windows 平台檢查與 `certutil` 使用測試替身；Windows 原生 `certutil` 與 Schannel 尚未實測。
 
 參考：[事件說明文章](https://sheng.page/posts/twca-intermediate-replacement-what-to-check/)、[TWCA 官方公告](https://ssl.twca.com.tw/news_detail/5f3395bf-bef6-4b40-b922-ceac4b06bf53)、[候選清單來源](https://bugzilla.mozilla.org/show_bug.cgi?id=2087236)。使用的比對資料見 [data/twca-intermediates.tsv](data/twca-intermediates.tsv)。
 
@@ -82,4 +101,10 @@ bash check-twca-cert.sh --help
 /bin/bash -n check-twca-cert.sh tests/test-check-twca-cert.sh
 shellcheck --shell=bash check-twca-cert.sh tests/test-check-twca-cert.sh
 /bin/bash tests/test-check-twca-cert.sh
+```
+
+PowerShell 測試不需要額外測試套件；Windows 使用原生 `certutil`，非 Windows 使用明示的測試替身，TLS 握手與政策驗證仍使用真實 .NET：
+
+```powershell
+pwsh -NoProfile -File ./tests/test-check-twca-cert.ps1
 ```
