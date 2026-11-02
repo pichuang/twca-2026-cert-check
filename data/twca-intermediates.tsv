@@ -1,0 +1,11 @@
+# SHA256<TAB>label<TAB>category<TAB>source_url<TAB>checked_at
+# Verified from crt.sh and CCADB PEM with OpenSSL; research candidates are not an official revocation list.
+# Coverage: all six research candidates plus the article observation.
+# CCADB PEM source: https://ccadb.my.salesforce-sites.com/mozilla/PublicAllIntermediateCertsWithPEMCSV
+01af2324d098098f5e0cdf6faabada430b21cce777f47eacb26248b2fda3e531	TWCA SSL Certification Authority (2023-02-23; crt.sh 10256433881)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T14:55:56Z
+f76e3339a6773dc5922da154628c8d22b5c915edcb15270db8fb3d8d24959e98	TWCA EVSSL Certification Authority (2023-02-23; crt.sh 9946963269)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T14:55:56Z
+c6e96a1745707099f02279472fa28a99bae447d77511e19e86baf3047651c1eb	TWCA Secure SSL Certification Authority (2023-08-18; CCADB)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T15:00:54Z
+1a2c75fd096e0499e9ff6ac74e526f61eaae3edfc8c2ea4436fee0c24d8b7d0e	TWCA Secure SSL Certification Authority (2023-10-16; CCADB)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T15:00:54Z
+815c549c6976bf163eb54710ffc7806b1e7541c688313312b606837767164094	TWCA SSL Certification Authority (2024-09-06; CCADB)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T15:00:54Z
+cac9fd0cd35aa5c480cd03fdd6edf0ca1a41fd02ac290ec83d83ceedf8ec245c	TWCA EVSSL Certification Authority (2024-09-06; crt.sh 14487601692)	research_candidate	https://bugzilla.mozilla.org/show_bug.cgi?id=2087236	2026-11-02T15:00:24Z
+49695a5f0f7ef6edf698193d99ed48baade20ea457403c11cead492c458665da	TWCA Global EVSSL Certification Authority (2012-08-23; crt.sh 5948298)	article_observation	https://sheng.page/posts/twca-intermediate-replacement-what-to-check/	2026-11-02T14:55:56Z
